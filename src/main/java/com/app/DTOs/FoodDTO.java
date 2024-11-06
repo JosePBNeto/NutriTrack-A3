@@ -12,16 +12,3 @@ public class FoodDTO {
     private List<MicronutrientDTO> micronutrients;
 }
 
-@Data
-class MacronutrientsDTO {
-    private Double proteins;
-    private Double carbohydrates;
-    private Double fats;
-}
-
-@Data
-class MicronutrientDTO {
-    private String name;
-    private Double amount;
-    private String unit;
-}
