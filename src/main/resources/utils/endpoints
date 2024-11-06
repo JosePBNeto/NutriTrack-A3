@@ -1,0 +1,25 @@
+POST /api/foods - Criar novo alimento
+GET /api/foods/search?name={nome} - Buscar alimentos por nome
+PUT /api/foods/{id} - Atualizar alimento
+DELETE /api/foods/{id} - Deletar alimento
+GET /api/reports/daily?date={data} - Gerar relatório diário
+
+* Entidades principais:
+Food: alimento com seus dados básicos
+Macronutrients: proteínas, carboidratos e gorduras
+Micronutrient: vitaminas e minerais
+DailyIntake: registro de consumo diário
+
+
+* Funcionalidades Implementadas:
+CRUD completo de alimentos
+Busca por nome
+Relatórios nutricionais (estrutura básica)
+
+* Para completar a implementação, você precisaria:
+Implementar os métodos de conversão DTO-Entity
+Adicionar validações nos DTOs
+Implementar tratamento de exceções
+Implementar a lógica de cálculo de nutrientes no ReportService
+Adicionar testes unitários
+Adicionar documentação com Swagger
