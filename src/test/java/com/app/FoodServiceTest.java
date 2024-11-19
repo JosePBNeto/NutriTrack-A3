@@ -3,11 +3,13 @@ package com.app;
 import com.app.DTOs.FoodDTO;
 import com.app.DTOs.MacronutrientsDTO;
 import com.app.DTOs.MicronutrientDTO;
+import com.app.exceptions.ResourceNotFoundException;
 import com.app.model.Food;
 import com.app.model.Macronutrients;
 import com.app.model.Micronutrient;
 import com.app.repositories.FoodRepository;
 import com.app.services.FoodService;
+import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,8 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -40,6 +41,7 @@ public class FoodServiceTest {
     private List<MicronutrientDTO> micronutrientsDTO;
     private List<Micronutrient> micronutrients;
 
+
     @BeforeEach
     void setUp() {
         // Configurar MacronutrientsDTO
@@ -49,17 +51,17 @@ public class FoodServiceTest {
         macronutrientsDTO.setFats(10.0);
 
         // Configurar MicronutrientDTO
-        MicronutrientDTO vitaminC = new MicronutrientDTO();
-        vitaminC.setName("Vitamin C");
-        vitaminC.setAmount(85.0);
-        vitaminC.setUnit("mg");
+        MicronutrientDTO vitaminaC = new MicronutrientDTO();
+        vitaminaC.setName("Vitamina C");
+        vitaminaC.setAmount(85.0);
+        vitaminaC.setUnit("mg");
 
-        micronutrientsDTO = Arrays.asList(vitaminC);
+        micronutrientsDTO = Arrays.asList(vitaminaC);
 
         // Configurar FoodDTO
         foodDTO = new FoodDTO();
-        foodDTO.setName("Chicken Breast");
-        foodDTO.setDescription("Grilled chicken breast");
+        foodDTO.setName("Peito de Frango");
+        foodDTO.setDescription("Peito de frango grelhado");
         foodDTO.setMacronutrients(macronutrientsDTO);
         foodDTO.setMicronutrients(micronutrientsDTO);
 
@@ -73,30 +75,32 @@ public class FoodServiceTest {
         // Configurar Micronutrient
         Micronutrient micronutrient = new Micronutrient();
         micronutrient.setId(1L);
-        micronutrient.setName("Vitamin C");
+        micronutrient.setName("Vitamina C");
         micronutrient.setAmount(85.0);
         micronutrient.setUnit("mg");
 
         micronutrients = Arrays.asList(micronutrient);
 
-
+        // Configurar Food
         food = new Food();
         food.setId(1L);
-        food.setName("Chicken Breast");
-        food.setDescription("Grilled chicken breast");
+        food.setName("Peito de Frango");
+        food.setDescription("Peito de frango grelhado");
         food.setMacronutrients(macronutrients);
         food.setMicronutrients(micronutrients);
     }
 
     @Test
     void createFood_Success() {
-
+        // Arrange
         when(foodRepository.save(any(Food.class))).thenReturn(food);
 
+        // Act
         Food createdFood = foodService.createFood(foodDTO);
 
+        // Assert
         assertNotNull(createdFood);
-        assertEquals("Chicken Breast", createdFood.getName());
+        assertEquals("Peito de Frango", createdFood.getName());
         assertEquals(20.0, createdFood.getMacronutrients().getProteins());
         assertEquals(1, createdFood.getMicronutrients().size());
 
@@ -104,44 +108,102 @@ public class FoodServiceTest {
     }
 
     @Test
+    void createFood_WithNullName_ThrowsValidationException() {
+        // Arrange
+        foodDTO.setName(null);
+
+        // Act & Assert
+        assertThrows(ValidationException.class, () -> {
+            foodService.createFood(foodDTO);
+        });
+
+        verify(foodRepository, never()).save(any(Food.class));
+    }
+
+    @Test
     void searchFoods_Success() {
+        // Arrange
+        String termoBusca = "Frango";
+        List<Food> alimentosEsperados = Arrays.asList(food);
+        when(foodRepository.findByNameContainingIgnoreCase(termoBusca))
+                .thenReturn(alimentosEsperados);
 
-        String searchTerm = "Chicken";
-        List<Food> expectedFoods = Arrays.asList(food);
-        when(foodRepository.findByNameContainingIgnoreCase(searchTerm))
-                .thenReturn(expectedFoods);
+        // Act
+        List<Food> alimentosEncontrados = foodService.searchFoods(termoBusca);
 
-
-        List<Food> foundFoods = foodService.searchFoods(searchTerm);
-
-
-        assertNotNull(foundFoods);
-        assertEquals(1, foundFoods.size());
-        assertEquals("Chicken Breast", foundFoods.get(0).getName());
+        // Assert
+        assertNotNull(alimentosEncontrados);
+        assertEquals(1, alimentosEncontrados.size());
+        assertEquals("Peito de Frango", alimentosEncontrados.get(0).getName());
 
         verify(foodRepository, times(1))
-                .findByNameContainingIgnoreCase(searchTerm);
+                .findByNameContainingIgnoreCase(termoBusca);
     }
 
     @Test
     void updateFood_Success() {
         // Arrange
-        Long foodId = 1L;
-        when(foodRepository.findById(foodId)).thenReturn(Optional.of(food));
+        Long idAlimento = 1L;
+        when(foodRepository.findById(idAlimento)).thenReturn(Optional.of(food));
         when(foodRepository.save(any(Food.class))).thenReturn(food);
 
-        foodDTO.setName("Updated Chicken Breast");
+        foodDTO.setName("Peito de Frango Atualizado");
 
+        // Act
+        Food alimentoAtualizado = foodService.updateFood(idAlimento, foodDTO);
 
-        Food updatedFood = foodService.updateFood(foodId, foodDTO);
+        // Assert
+        assertNotNull(alimentoAtualizado);
+        assertEquals("Peito de Frango Atualizado", alimentoAtualizado.getName());
 
-
-        assertNotNull(updatedFood);
-        assertEquals("Updated Chicken Breast", updatedFood.getName());
-
-        verify(foodRepository, times(1)).findById(foodId);
+        verify(foodRepository, times(1)).findById(idAlimento);
         verify(foodRepository, times(1)).save(any(Food.class));
     }
 
+    @Test
+    void updateFood_NotFound_ThrowsResourceNotFoundException() {
+        // Arrange
+        Long foodId = 999L;
+        when(foodRepository.findById(foodId)).thenReturn(Optional.empty());
 
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> {
+            foodService.updateFood(foodId, foodDTO);
+        });
+
+        verify(foodRepository, times(1)).findById(foodId);
+        verify(foodRepository, never()).save(any(Food.class));
+    }
+
+    @Test
+    void deleteFood_Success() {
+        // Arrange
+        Long idAlimento = 1L;
+        when(foodRepository.existsById(idAlimento)).thenReturn(true);
+        doNothing().when(foodRepository).deleteById(idAlimento);
+
+        // Act
+        foodService.deleteFood(idAlimento);
+
+        // Assert
+        verify(foodRepository, times(1)).existsById(idAlimento);
+        verify(foodRepository, times(1)).deleteById(idAlimento);
+    }
+
+    @Test
+    void deleteFood_NotFound_ThrowsResourceNotFoundException() {
+        // Arrange
+        Long foodId = 999L;
+        when(foodRepository.existsById(foodId)).thenReturn(false);
+
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> {
+            foodService.deleteFood(foodId);
+        });
+
+        verify(foodRepository, times(1)).existsById(foodId);
+        verify(foodRepository, never()).deleteById(foodId);
+    }
 }
+
+

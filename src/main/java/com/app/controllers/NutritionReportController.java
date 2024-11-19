@@ -1,7 +1,9 @@
 package com.app.controllers;
 
+import com.app.DTOs.NutrientTotals;
 import com.app.services.NutritionReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +20,15 @@ public class NutritionReportController {
     private NutritionReportService reportService;
 
     @GetMapping("/daily")
-    public ResponseEntity<Map<String, Double>> getDailyReport(@RequestParam LocalDate date) {
+    public ResponseEntity<NutrientTotals> getDailyReport(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return ResponseEntity.ok(reportService.generateDailyReport(date));
+    }
+
+    @GetMapping("/period")
+    public ResponseEntity<NutrientTotals> getPeriodReport(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(reportService.generatePeriodReport(startDate, endDate));
     }
 }

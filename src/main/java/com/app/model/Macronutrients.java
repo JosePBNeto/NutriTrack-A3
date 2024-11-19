@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "macronutrients")
 public class Macronutrients {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

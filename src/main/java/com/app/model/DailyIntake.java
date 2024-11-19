@@ -8,7 +8,6 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "macronutrients")
 public class DailyIntake {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

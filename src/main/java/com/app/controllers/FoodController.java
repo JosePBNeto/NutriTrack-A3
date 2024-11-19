@@ -3,6 +3,7 @@ package com.app.controllers;
 import com.app.DTOs.FoodDTO;
 import com.app.model.Food;
 import com.app.services.FoodService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class FoodController {
     private FoodService foodService;
 
     @PostMapping
-    public ResponseEntity<Food> createFood(@RequestBody FoodDTO foodDTO) {
+    public ResponseEntity<Food> createFood(@Valid @RequestBody FoodDTO foodDTO) {
         return ResponseEntity.ok(foodService.createFood(foodDTO));
     }
 
