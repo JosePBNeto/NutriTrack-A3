@@ -1,0 +1,37 @@
+name: Build and Test with JaCoCo
+
+on:
+  push:
+    branches:
+      - main # Nome da branch principal
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout do código
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Configurar o JDK
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '20' # Alterar para a versão que seu projeto utiliza
+          distribution: 'temurin' # Pode usar 'zulu' ou outro conforme preferido
+          cache: maven
+
+      # 3. Build do projeto e execução dos testes
+      - name: Build and Test
+        run: mvn clean verify
+
+      # 4. Upload do relatório de cobertura
+      - name: Upload JaCoCo Coverage Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
