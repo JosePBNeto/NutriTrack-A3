@@ -35,7 +35,7 @@ jobs:
 
       # Build e execução dos testes
       - name: Build and run tests
-        run: mvn clean verify
+        run: mvn test "-Dspring.profiles.active=test"
 
       # Executar a aplicação para validação (opcional)
       - name: Run application
@@ -46,6 +46,8 @@ jobs:
           SPRING_DATASOURCE_USERNAME: sa
           SPRING_DATASOURCE_PASSWORD: ''
 
-      # Verificar logs ou status (opcional)
-      - name: Check logs
-        run: cat target/spring.log
+      - name: Upload JaCoCo Coverage Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
