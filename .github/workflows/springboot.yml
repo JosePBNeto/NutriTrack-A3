@@ -1,0 +1,51 @@
+name: CI/CD Pipeline for Spring Boot Application
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Configuração do repositório
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # Configuração do JDK
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin' # Escolha do JDK (Temurin é recomendado)
+          java-version: '17'      # Substitua pela versão do JDK usada no seu projeto
+
+      # Configuração do cache do Maven
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Build e execução dos testes
+      - name: Build and run tests
+        run: mvn clean verify
+
+      # Executar a aplicação para validação (opcional)
+      - name: Run application
+        run: mvn spring-boot:run &
+        env:
+          SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb
+          SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.h2.Driver
+          SPRING_DATASOURCE_USERNAME: sa
+          SPRING_DATASOURCE_PASSWORD: ''
+
+      # Verificar logs ou status (opcional)
+      - name: Check logs
+        run: cat target/spring.log
