@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'adoptopenjdk'  # Specify the distribution, e.g., 'adoptopenjdk', 'zulu', etc.
+          distribution: 'adoptium'
 
       - name: Install dependencies
         run: mvn install -DskipTests
