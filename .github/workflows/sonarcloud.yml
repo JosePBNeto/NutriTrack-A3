@@ -28,5 +28,5 @@ jobs:
         run: mvn sonar:sonar
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: "josepbneto/JosePBNeto_NutriTrack-A3"
-          SONAR_ORGANIZATION: "josepbneto"
+          SONAR_PROJECT_KEY: "JosePBNeto/NutriTrack-A3"
+          SONAR_ORGANIZATION: "JosePBNeto"
