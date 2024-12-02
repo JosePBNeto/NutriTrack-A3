@@ -21,8 +21,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin' # Escolha do JDK (Temurin é recomendado)
-          java-version: '17'      # Substitua pela versão do JDK usada no seu projeto
+          distribution: 'temurin'
+          java-version: '17'
 
       # Configuração do cache do Maven
       - name: Cache Maven packages
@@ -37,7 +37,7 @@ jobs:
       - name: Build and run tests
         run: mvn test "-Dspring.profiles.active=test"
 
-      # Executar a aplicação para validação (opcional)
+      # Executar a aplicação para validação
       - name: Run application
         run: mvn spring-boot:run &
         env:

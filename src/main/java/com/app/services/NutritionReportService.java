@@ -24,7 +24,7 @@ public class NutritionReportService {
         List<DailyIntake> intakes = dailyIntakeRepository.findByDateBetween(date, date);
 
         if (intakes.isEmpty()) {
-            throw new ValidationException("No food intake recorded for date: " + date);
+            throw new ValidationException("Sem registros na data: " + date);
         }
 
         // Extrair todos os alimentos consumidos no dia
@@ -37,14 +37,14 @@ public class NutritionReportService {
 
     public NutrientTotals generatePeriodReport(LocalDate startDate, LocalDate endDate) {
         if (startDate.isAfter(endDate)) {
-            throw new ValidationException("Start date cannot be after end date");
+            throw new ValidationException("Data inicial náo pode ser depois da data final");
         }
 
         List<DailyIntake> intakes = dailyIntakeRepository.findByDateBetween(startDate, endDate);
 
         if (intakes.isEmpty()) {
             throw new ValidationException(
-                    String.format("No food intake recorded between %s and %s", startDate, endDate));
+                    String.format("Sem registro de consumo entre %s e %s", startDate, endDate));
         }
 
         List<Food> consumedFoods = intakes.stream()
